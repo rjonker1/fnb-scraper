@@ -8,14 +8,14 @@ FNB_URL = 'https://www.fnb.co.za/'
 class IndexPage:	
 	def __init__(self, html):		
 		self._html = html
-		# self._stop_datetime = stop_datetime
+		# self._stop_datetime = stop_datetime		
 		self._soup = BeautifulSoup(self._html, 'html.parser')
 		self.items = []
 		self._parse()
 
-	def _parse(self):
-		container = self._soup.find(class='loginFields')
-		if container:
-			divs = container.find_all('div')
-			for elment in divs:
-				self.items.append(elments)		
+	def _parse(self):		
+		loginFields = self._soup.find(class_='loginFields')
+		if loginFields:
+			textInputDivs = loginFields.find_all(class_='textinput')
+			for element in textInputDivs:
+				self.items.append(element)
