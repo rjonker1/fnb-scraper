@@ -1,39 +1,39 @@
 """
-Scrape the index page to login
+Login and scrape the index page
 """
 import sys
 import platform
 import requests
 
+from config import *
 from models.index import IndexPage
+from models.login import LoginPage
 from datetime import datetime
 from utils import eprint
 from selenium import webdriver
 
-FNB_LOGIN_URL = 'https://www.fnb.co.za/'
-
-if platform.system() == 'Windows':
-	PHANTOMJS_PATH = './phantomjs.exe'
-else:
-	PHANTOMJS_PATH = './phantomjs'
-
 def scrape_index():
-	response = requests.get(FNB_LOGIN_URL)
+	response = requests.get(FNB_URL)
 	eprint('{0} [{1}]'.format(response.url, response.status_code))
+	browser = webdriver.PhantomJS(PHANTOMJS_PATH, service_args=['--ignore-ssl-errors=true', '--ssl-protocol=TLSv1'])
+	browser.set_window_size(1120, 550)
+	browser.get(FNB_URL)
 
-	browser = webdriver.PhantomJS(PHANTOMJS_PATH)
-	browser.get(FNB_LOGIN_URL)
+	loginPage = LoginPage(browser)
+	loginPage.Login()
+
+	print(browser.current_url)
+
+	#browser.get(browser.current_url)
 	page = IndexPage(browser.page_source)
 
-	#response = requests.get(FNB_LOGIN_URL)
-	#eprint('{0} [{1}]'.format(response.url, response.status_code))
-	#page = IndexPage(response.content)
-
 	if not len(page.items):
-		return
+		print('login failed!')
 
 	for item in page.items:
 		print(item.prettify())
 
-if __name__ == '__main__':
+	loginPage.Logout()
+
+if __name__ == '__main__':	
 	scrape_index()
